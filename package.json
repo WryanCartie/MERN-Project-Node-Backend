@@ -1,0 +1,24 @@
+{
+  "name": "mern-project-node-backend",
+  "version": "1.0.0",
+  "description": "A node backend app for the MERN application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WryanCartie/MERN-Project-Node-Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WryanCartie/MERN-Project-Node-Backend/issues"
+  },
+  "homepage": "https://github.com/WryanCartie/MERN-Project-Node-Backend#readme",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2"
+  }
+}
