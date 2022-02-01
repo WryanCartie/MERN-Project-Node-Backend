@@ -1,11 +1,46 @@
 const express = require('express');
 
 
+const DUMMY_PLACES = [
+    {
+        id: 'p1',
+        title: 'Stockholm Royal Palace',
+        description: 'The Grand Palace of the Swedish Empire !!',
+        location : {
+            lat: 59.3268,
+            lng: 18.0717
+        },
+        address: 'Kungliga slottet, 107 70 Stockholm, Sweden',
+        creator: 'u1'
+    }
+]
+
 const router = express.Router();
 
-router.get('/',(req,res,next)=>{
-    console.log('GET REQUEST in places');
-    res.json({message: 'It Works'})
+router.get('/user/:uid',(req,res,next)=>{
+    const userId = req.params.uid;
+    const place = DUMMY_PLACES.find(p=>p.creator == userId);
+    if(!place){
+        const error = new Error('Could not find the place for the selected user id.')
+        error.code = 404
+        return next(error)
+    }
+
+    res.json({place})
+})
+
+router.get('/:pid',(req,res,next)=>{
+    const placeId = req.params.pid;
+    const place = DUMMY_PLACES.find(p=>{
+        return p.id == placeId
+    })
+
+    if(!place){
+        const error = new Error('Could not find the place for the selected id.')
+        error.code = 404;
+        return next(error)
+    }
+    res.json({place});
 })
 
 module.exports = router; 
