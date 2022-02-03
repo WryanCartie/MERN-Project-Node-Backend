@@ -2,7 +2,7 @@ const{ v4: uuid} = require('uuid');
 
 const HttpError = require('../models/http-error')
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
     {
         id: 'p1',
         title: 'Stockholm Royal Palace',
@@ -31,21 +31,22 @@ const getPlacesById = (req,res,next) =>{
 
 const getPlacesByUserId = (req,res,next) =>{
     const userId = req.params.uid;
-    const place = DUMMY_PLACES.find(p=>p.creator == userId);
-    if(!place){
-        const error = HttpError('Could not find the place for the selected user id.',404)
+    const places = DUMMY_PLACES.filter(p=>p.creator == userId);
+    if(places.length == 0){
+        const error = HttpError('Could not find places for the selected user id.',404)
     
         return next(error)
     }
 
-    res.json({place})
+    res.json({places})
 }
 
 const createPlace = (req,res,next) =>{
     console.log(req.body);
-    const {description,coordinates,address,creator} = req.body;
+    const {title,description,coordinates,address,creator} = req.body;
 
     const createdPlace = {
+        title,
         id: uuid(),
         description,
         location: coordinates,
@@ -58,6 +59,35 @@ const createPlace = (req,res,next) =>{
      res.status(201).json({place:createdPlace});
 }
 
+const updatePlace = (req,res,next) =>{
+    const placeId = req.params.pid;
+    const {title,description} = req.body;
+
+    
+    const updatedPlace = {...DUMMY_PLACES.find(p=>{
+        return p.id == placeId
+    })}
+
+    const targetIndex = DUMMY_PLACES.findIndex(p=> p.id == placeId);
+
+    updatedPlace.title = title;
+    updatedPlace.description = description;
+
+    DUMMY_PLACES[targetIndex] = updatedPlace
+
+    res.status(201).json({place:updatedPlace});
+
+}
+
+const deletePlace = (req,res,next) =>{
+    const placeId = req.params.pid;
+   DUMMY_PLACES = DUMMY_PLACES.filter(p=>p.id != placeId);
+
+   res.status(200).json({message: `Places with the id ${placeId} has been deleted !!`});
+}
+
 exports.createPlace = createPlace;
 exports.getPlacesById = getPlacesById;
 exports.getPlacesByUserId = getPlacesByUserId;
+exports.deletePlace = deletePlace;
+exports.updatePlace = updatePlace;

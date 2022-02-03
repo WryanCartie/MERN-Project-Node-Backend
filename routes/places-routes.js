@@ -13,6 +13,10 @@ router.get('/user/:uid',placesController.getPlacesByUserId)
 
 router.get('/:pid',placesController.getPlacesById);
 
+router.delete('/:pid',placesController.deletePlace);
+
+router.patch('/:pid',placesController.updatePlace)
+
 
 
 module.exports = router; 
