@@ -1,5 +1,6 @@
 const{ v4: uuid} = require('uuid');
 const {validationResult} = require('express-validator')
+const getCoordsForAddress = require('../util/location')
 
 
 
@@ -50,9 +51,11 @@ const createPlace = (req,res,next) =>{
     if(!errorResult.isEmpty()){
         return next(new HttpError('Invalid input passed, please check your data !!',422))
     }
-    console.log(req.body); 
-    const {title,description,coordinates,address,creator} = req.body;
 
+    
+    console.log(req.body);  
+    const {title,description,address,creator} = req.body;
+    const coordinates = getCoordsForAddress(address);
     const createdPlace = {
         title,
         id: uuid(),
