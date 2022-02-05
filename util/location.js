@@ -8,4 +8,4 @@ function getCoordsForAddress(address) {
     
 }
 
-export default getCoordsForAddress;
+module.exports = getCoordsForAddress;
