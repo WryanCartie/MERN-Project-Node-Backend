@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const bodyParser = require('body-parser');
 
@@ -28,4 +29,10 @@ app.use((error,req,res,next)=>{
     res.json({message: error.message})
 })
 
-app.listen(5000);
+mongoose.connect('mongodb+srv://Kruyoso:Anastasia15@cluster0.cx4p6z3.mongodb.net/places?retryWrites=true&w=majority')
+.then(err=>{
+    app.listen(5000);
+})
+.catch((err)=>{
+    console.log(err)
+});
