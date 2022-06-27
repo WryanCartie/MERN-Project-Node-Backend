@@ -45,7 +45,7 @@ const getPlacesByUserId = (req,res,next) =>{
     res.json({places})
 }
 
-const createPlace = (req,res,next) =>{
+const createPlace = async (req,res,next) =>{
 
     const errorResult = validationResult(req);
     if(!errorResult.isEmpty()){
@@ -56,19 +56,21 @@ const createPlace = (req,res,next) =>{
     console.log(req.body);  
     const {title,description,address,creator} = req.body;
     const coordinates = getCoordsForAddress(address);
+  
     
     const createdPlace = new Place({
         title,
         description,
         address,
-        location: req.body.coordinates,
-        images:'https://staticdelivery.nexusmods.com/mods/3174/images/thumbnails/1326/1326-1588792092-849606496.png',
-        creator: req.body.creator
+        location: coordinates,
+        image:'https://staticdelivery.nexusmods.com/mods/3174/images/thumbnails/1326/1326-1588792092-849606496.png',
+        creator
     })
 
     try{    
-        await createPlace.save();
-    }catch(err){
+        await createdPlace.save();
+     
+    } catch(err){
         const error = new HttpError(
             'Creating place failed, please try again.',
             500
