@@ -3,6 +3,8 @@ const{ v4: uuid} = require('uuid');
 const HttpError = require('../models/http-error')
 const {validationResult} = require('express-validator');
 
+const User = require('../models/user')
+
 const DUMMY_USERS = [
     {
         id: 'u1',
@@ -17,26 +19,42 @@ const getUsers = (req,res,next)=>{
     res.json({users: DUMMY_USERS});
 }
 
-const signup = (req,res,next) =>{
-    const errorResult = validationResult();
+const signup = async (req,res,next) =>{
+    const errorResult = validationResult(req);
     if(!errorResult.isEmpty()){
         return next(new HttpError('Invalid input passed, please check your data !!',422))
     }
-    const{name,email,password} = req.body;
+    const{name,email,password,places} = req.body;
 
-    const hasUser = DUMMY_USERS.find(u=> u.email == email);
-    if(hasUser){
-        return next(new HttpError('Could not add user, user already exists !!',401));
+    let existingUser;
+    try{
+        existingUser = await User.findOne({email: email})
+    }catch(err){
+        const error = new HttpError('Signup failed heree, please try again.',500)
+        return next(error)
     }
 
-    const createdUser = {
+    if(existingUser){
+        const error = new HttpError('User already existed, please try again.',422)
+        return next(error)
+    }
+
+
+    const createdUser = new User({
         name,
         email,
+        image:'https://static.wikia.nocookie.net/beyblade/images/3/33/BBGT_Imperial_Dragon_Ignition%27_Beyblade.png/revision/latest',
         password,
-        id:uuid()
+        places
+    });
+ 
+    try{
+        await createdUser.save();
+    }catch(err){
+        const error = new HttpError('Signing up failed, please try again.',500)
+        return next(error)
     }
-    DUMMY_USERS.push(createdUser);
-    res.status(201).json({user: createdUser,message:'User Signup Sucessfull !!'})
+    res.status(201).json({user: createdUser.toObject({getters: true}),message:'User Signup Sucessfull !!'})
 }
 
 const login = (req,res,next) =>{
