@@ -15,8 +15,14 @@ const DUMMY_USERS = [
     }
 ]
 
-const getUsers = (req,res,next)=>{
-    res.json({users: DUMMY_USERS});
+const getUsers = async (req,res,next)=>{
+    let users
+    try{
+        users = await User.find({},'email name')
+    }catch(err){
+        const Error = new HttpError('Could not fetch users, please try again.',500)
+    }
+    res.json({users: users.map(user=> user.toObject({getters: true}))})
 }
 
 const signup = async (req,res,next) =>{
@@ -71,7 +77,7 @@ const login = async(req,res,next) =>{
     const error = new HttpError('Invalid Login, please try again.',401)
     return next(error)
  }
-    res.json({message:'Logged in sucessfull !!'})
+    res.json({message:'Logged in sucessfully !!'})
 }
 
 exports.login = login;
