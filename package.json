@@ -25,5 +25,8 @@
     "mongoose-unique-validator": "^3.1.0",
     "nodemon": "^2.0.16",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "prettier": "2.7.1"
   }
 }
