@@ -8,7 +8,7 @@ const User = require("../models/user");
 const getUsers = async (req, res, next) => {
   let users;
   try {
-    users = await User.find({}, "email name");
+    users = await User.find({}, "-password");
   } catch (err) {
     const Error = new HttpError(
       "Could not fetch users, please try again.",
