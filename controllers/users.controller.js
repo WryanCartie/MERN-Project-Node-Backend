@@ -77,7 +77,8 @@ const login = async (req, res, next) => {
     const error = new HttpError("Invalid Login, please try again.", 401);
     return next(error);
   }
-  res.json({ message: "Logged in sucessfully !!" });
+  res.json({ message: "Logged in sucessfully !!" ,
+  user: createdUser.toObject({ getters: true }),});
 };
 
 exports.login = login;
