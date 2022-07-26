@@ -65,6 +65,7 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(email)
 
   let existingUser;
   try {
@@ -73,10 +74,11 @@ const login = async (req, res, next) => {
     const error = new HttpError("Signing up, please try again.", 500);
     return next(error);
   }
-  if (existingUser && existingUser.password !== password) {
+  if (!existingUser ||  existingUser.password !== password) {
     const error = new HttpError("Invalid Login, please try again.", 401);
     return next(error);
   }
+  console.log(existingUser);
   res.json({ message: "Logged in sucessfully !!" ,
   user: existingUser.toObject({ getters: true }),});
 };
