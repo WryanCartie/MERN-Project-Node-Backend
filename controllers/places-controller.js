@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
+const fs = require('fs')
 
 const HttpError = require("../models/http-error");
 
@@ -77,7 +78,7 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image:
-      "https://staticdelivery.nexusmods.com/mods/3174/images/thumbnails/1326/1326-1588792092-849606496.png",
+     req.file.path, 
     creator,
   });
   let user;
@@ -165,6 +166,7 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+  const imagePath = place.image
 
   try {
     const sess = await mongoose.startSession();
@@ -177,6 +179,7 @@ const deletePlace = async (req, res, next) => {
     const error = new HttpError("Could not delete place, please try again.");
     return next(error);
   }
+  fs.unlink(imagePath)
 
   res
     .status(200)
