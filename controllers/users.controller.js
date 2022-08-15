@@ -25,7 +25,7 @@ const signup = async (req, res, next) => {
       new HttpError("Invalid input passed, please check your data !!", 422)
     );
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password} = req.body;
 
   let existingUser;
   try {
@@ -43,10 +43,9 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://static.wikia.nocookie.net/beyblade/images/3/33/BBGT_Imperial_Dragon_Ignition%27_Beyblade.png/revision/latest",
+    image: req.file.path
     password,
-    places,
+    places : [],
   });
 
   try {
