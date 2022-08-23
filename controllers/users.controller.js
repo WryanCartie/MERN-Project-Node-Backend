@@ -42,9 +42,9 @@ const signup = async (req, res, next) => {
   }
   let hashedPassword;
   try{
-    hashedPassword = brcypt.hash(password,12)
+    hashedPassword = await brcypt.hash(password,12)
   }catch(err){
-    const error = new HttpError("User creation failed, please try again")
+    const error = new HttpError("User creation failed, please try again",500)
     return next(error)
   }
 
@@ -78,10 +78,23 @@ const login = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
-    const error = new HttpError("Signing up, please try again.", 500);
+    const error = new HttpError("Login in Failed, please try again.", 500);
     return next(error);
   }
-  if (!existingUser ||  existingUser.password !== password) {
+  if (!existingUser) {
+    const error = new HttpError("Invalid Login, please try again.", 401);
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try{
+    isValidPassword = await bcrypt.compare(password,existingUser.password)
+  }catch(err){
+    const error = new HttpError("Login in Failed, please try again.", 500);
+    return next(error);
+  }
+
+  if(!isValidPassword){
     const error = new HttpError("Invalid Login, please try again.", 401);
     return next(error);
   }
