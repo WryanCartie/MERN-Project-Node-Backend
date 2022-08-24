@@ -2,7 +2,8 @@ const { v4: uuid } = require("uuid");
 
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 
@@ -26,7 +27,7 @@ const signup = async (req, res, next) => {
       new HttpError("Invalid input passed, please check your data !!", 422)
     );
   }
-  const { name, email, password} = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -41,19 +42,19 @@ const signup = async (req, res, next) => {
     return next(error);
   }
   let hashedPassword;
-  try{
-    hashedPassword = await brcypt.hash(password,12)
-  }catch(err){
-    const error = new HttpError("User creation failed, please try again",500)
-    return next(error)
+  try {
+    hashedPassword = await brcypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError("User creation failed, please try again", 500);
+    return next(error);
   }
 
   const createdUser = new User({
     name,
     email,
     image: req.file.path,
-    password : hashedPassword,
-    places : [],
+    password: hashedPassword,
+    places: [],
   });
 
   try {
@@ -62,17 +63,27 @@ const signup = async (req, res, next) => {
     const error = new HttpError("Signing up failed, please try again.", 500);
     return next(error);
   }
-  res
-    .status(201)
-    .json({
-      user: createdUser.toObject({ getters: true }),
-      message: "User Signup Sucessfull !!",
-    });
+
+  let token;
+  try {
+    token = await jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      "hidden_code_dont_share",
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Signing up failed, please try again.", 500);
+    return next(error);
+  }
+  res.status(201).json({
+    user: createdUser.toObject({ getters: true }),
+    message: "User Signup Sucessfull !!",
+    token: token,
+  });
 };
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-
 
   let existingUser;
   try {
@@ -87,20 +98,37 @@ const login = async (req, res, next) => {
   }
 
   let isValidPassword = false;
-  try{
-    isValidPassword = await bcrypt.compare(password,existingUser.password)
-  }catch(err){
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
     const error = new HttpError("Login in Failed, please try again.", 500);
     return next(error);
   }
 
-  if(!isValidPassword){
+  if (!isValidPassword) {
     const error = new HttpError("Invalid Login, please try again.", 401);
     return next(error);
   }
+  let token;
+  try {
+    token = await jwt.sign(
+      {
+        id: existingUser.id,
+        email: existingUser.email,
+      },
+      "hidden_code_dont_share",
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Login in Failed, please try again.", 500);
+    return next(error);
+  }
 
-  res.json({ message: "Logged in sucessfully !!" ,
-  user: existingUser.toObject({ getters: true }),});
+  res.json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token
+  });
 };
 
 exports.login = login;
