@@ -7,12 +7,13 @@ module.exports = (req,res,next) =>{
         return next()
     }
     try{
-        const token= req.headers. authorization.split(' ')[1];
+        const token= req.headers.authorization.split(' ')[1];
+        console.log(token);
         if(!token){
             throw new Error('Authenthication failed');
         }
         const decodedToken = jwt.verify(token,"hidden_code_dont_share")
-        req.userData = {userId: decodedToken.userId}
+        req.userData = {userId: decodedToken.id}
         next()
     }catch(err){
         const error = new HttpError('Authenthication failed',401)

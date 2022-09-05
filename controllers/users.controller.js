@@ -75,11 +75,9 @@ const signup = async (req, res, next) => {
     const error = new HttpError("Signing up failed, please try again.", 500);
     return next(error);
   }
-  res.status(201).json({
-    user: createdUser.toObject({ getters: true }),
-    message: "User Signup Sucessfull !!",
-    token: token,
-  });
+  res
+  .status(201)
+  .json({ userId: createdUser.id, email: createdUser.email, token: token });
 };
 
 const login = async (req, res, next) => {

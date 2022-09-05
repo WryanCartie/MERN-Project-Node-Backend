@@ -34,6 +34,7 @@ const getPlacesById = async (req, res, next) => {
 
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
+  console.log(userId)
   let userWithPlaces;
   try {
     userWithPlaces = await User.findById(userId).populate("places");
@@ -68,7 +69,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
-  console.log(req.body);
+
   const { title, description, address } = req.body;
   const coordinates = getCoordsForAddress(address);
 
