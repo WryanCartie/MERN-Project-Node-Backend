@@ -1,26 +1,25 @@
 const multer = require('multer')
+const { v4: uuid } = require("uuid");
 
-const MINE_TYPE_MAP = {
-    'image.jpg':'jpg',
-    'image.jpeg':'jpeg',
-    'image.png':'png'
-}
+
+const MIME_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpeg',
+  'image/jpg': 'jpg'
+};
+
 const fileUpload = multer({
-    limits: 50000,
-    storage: multer.diskStorage({
-        destination :(req,res,file) =>{
-            cb('null','uploads/images')
-        },
-        filename: (req,file,cb) =>{
-            const ext = MINE_TYPE_MAP[file.mimetype]
-            cb(nullm,uuid()+'.'+ext)
-        },
-        fileFilter: (req,file,cb) =>{
-            const isValid = !!MINE_TYPE_MAP[file.mintype]
-            const error = isValid ? null : new Error('Invalid mine type!!')
-            cb(error,isValid)
-        }
-    })
-})
+  limits: 500000,
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/images');
+    },
+    filename: (req, file, cb) => {
+      const ext = MIME_TYPE_MAP[file.mimetype];
+      cb(null, uuid() + '.' + ext);
+    }
+  }),
 
-module.exports = fileUpload
+});
+
+module.exports = fileUpload;
